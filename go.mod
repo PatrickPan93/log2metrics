@@ -3,6 +3,8 @@ module log2metrics
 go 1.17
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.10.0
+	github.com/caarlos0/env/v6 v6.8.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/oklog/run v1.1.0
 	github.com/pkg/errors v0.9.1

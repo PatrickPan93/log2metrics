@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log2metrics/src/common/nginx_log_generator"
 	"log2metrics/src/modules/agent/config"
 	"log2metrics/src/modules/agent/logjob"
 	"log2metrics/src/modules/agent/metric"
@@ -10,6 +11,8 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/oklog/run"
 
@@ -105,6 +108,14 @@ func main() {
 				log.Printf("%+v", err)
 			}
 			return nil
+		}, func(err error) {
+			cancel()
+		})
+	}
+	{
+		g.Add(func() error {
+			nginx_log_generator.Run(ctx)
+			return errors.New("nginx_log_generator: running error")
 		}, func(err error) {
 			cancel()
 		})
