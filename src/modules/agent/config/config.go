@@ -67,6 +67,7 @@ func setLogRegs(cfg *Config) []*LogStrategy {
 	// 处理主正则
 	for _, st := range cfg.LogStrategies {
 		st := st
+		st.TagRegs = make(map[string]*regexp.Regexp)
 		if len(st.Pattern) != 0 {
 			// 编译正则表达式
 			reg, err := regexp.Compile(st.Pattern)
@@ -82,9 +83,6 @@ func setLogRegs(cfg *Config) []*LogStrategy {
 			if err != nil {
 				log.Printf("%+v", errors.Wrapf(err, "config.setLogRegs: compile tags pattern regexp failed: %s\n", tagV))
 				continue
-			}
-			if len(st.TagRegs) == 0 {
-				st.TagRegs = make(map[string]*regexp.Regexp, 0)
 			}
 			st.TagRegs[tagK] = reg
 		}
