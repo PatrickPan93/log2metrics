@@ -1,0 +1,17 @@
+
+log_strategies:
+  # 指定暴露的metrics name
+  - metric_name: log_containerd_total
+    metric_help: /var/log/messages
+    file_path: /var/log/messages
+    pattern:  ".*containerd.*"
+    # 计算方式
+    func: cnt
+    # 生成新的标签的正则
+    tags:
+      level: ".*level=(.*?) .*"
+  - metric_name: ngx_acc_code
+    metric_help: nginx code avg
+    file_path: /var/log/nginx/access.log
+    pattern:  '.*\[code=(.*?)\].*'
+    func: avg
