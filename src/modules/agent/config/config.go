@@ -13,6 +13,11 @@ type Config struct {
 	RpcServerAddr string         `yaml:"rpc_server_addr"`
 	LogStrategies []*LogStrategy ` yaml:"log_strategies"`
 	HttpAddr      string         `yaml:"http_addr"`
+	LocalConfig   *Local         `yaml:"local_config"`
+}
+
+type Local struct {
+	NginxLogGenerating bool `yaml:"nginx_log_generating"`
 }
 
 // LogStrategy 定义log配置结构体

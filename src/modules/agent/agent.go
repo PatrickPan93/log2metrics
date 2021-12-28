@@ -113,12 +113,15 @@ func main() {
 		})
 	}
 	{
-		g.Add(func() error {
-			nginx_log_generator.Run(ctx)
-			return errors.New("nginx_log_generator: running error")
-		}, func(err error) {
-			cancel()
-		})
+		if agentConfig.LocalConfig.NginxLogGenerating {
+			g.Add(func() error {
+				nginx_log_generator.Run(ctx)
+				return errors.New("nginx_log_generator: running error")
+			}, func(err error) {
+				cancel()
+			})
+		}
 	}
+
 	g.Run()
 }

@@ -1,3 +1,5 @@
+local_config:
+  nginx_log_generating: true
 
 log_strategies:
   # 指定暴露的metrics name
