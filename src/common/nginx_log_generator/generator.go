@@ -25,14 +25,14 @@ type config struct {
 	PercentageDelete int     `env:"DELETE_PERCENT" envDefault:"0"`
 }
 
-func Run(ctx context.Context) {
+func Run(ctx context.Context, rate int) {
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
 		panic(err)
 	}
 	checkMinMax(&cfg.PathMinLength, &cfg.PathMaxLength)
 
-	ticker := time.NewTicker(time.Second / time.Duration(cfg.Rate))
+	ticker := time.NewTicker(time.Second / time.Duration(rate))
 
 	gofakeit.Seed(time.Now().UnixNano())
 
@@ -58,7 +58,7 @@ func Run(ctx context.Context) {
 			userAgent = gofakeit.UserAgent()
 			os.Stdout = f
 			os.Stderr = f
-			fmt.Printf("%s - - [%s] \"%s %s %s\" %v %v \"%s\" \"%s\"\n", ip, timeLocal.Format("02/Jan/2006:15:04:05 -0700"), httpMethod, path, httpVersion, statusCode, bodyBytesSent, referrer, userAgent)
+			fmt.Printf("%s - - [%s] \"%s %s %s\" [code=%v] %v \"%s\" \"%s\"\n", ip, timeLocal.Format("02/Jan/2006:15:04:05 -0700"), httpMethod, path, httpVersion, statusCode, bodyBytesSent, referrer, userAgent)
 
 		case <-ctx.Done():
 			f.Close()

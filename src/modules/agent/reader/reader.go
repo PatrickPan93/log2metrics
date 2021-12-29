@@ -59,6 +59,7 @@ func (r *Reader) openFile(whence int, filePath string) error {
 }
 
 func (r *Reader) Start() {
+	// 开始读取日志
 	r.StartRead()
 }
 
@@ -74,33 +75,37 @@ func (r *Reader) StartRead() {
 		dropCnt, dropSwp int64
 	)
 
+	// 会临时开启goroutine进行日志处理,由于需要控制该goroutine的生命周期, 所以生成channel用以达到该目的
 	analysisClose := make(chan struct{})
-	// 使用goroutine进行统计
+	// 使用goroutine进行日志分析处理
 	go func() {
 		for {
 			select {
 			// 通过外层chan 控制生命周期
 			case <-analysisClose:
 				return
-			// 每十秒统计
+			// 每十秒跳出select循环
 			case <-time.After(10 * time.Second):
 			}
+			// 先将历史read和drop记录复制给临时变量a、b
 			a := readCnt
 			b := dropCnt
-			// 因为每10s触发一次, 所以用a的值减去readSwap就是过去10秒的值
+			// 因为每10s触发一次用以统计过去10s中read和drop的数量, 所以用a、b的值分别减去readSwap、dropSwap就是过去10秒的值
 			log.Printf("read [%d] line in last 10s", a-readSwp)
 			log.Printf("drop [%d] line in last 10s", b-dropSwp)
 
-			// 把旧的值赋值给swp，用作下次10s统计
+			// 把本次的read和drop值赋值给swp，用作下次10s统计
 			readSwp = a
 			dropSwp = b
 		}
 	}()
 
+	// 利用tailer进行日志读取
 	for line := range r.tailer.Lines {
 		// 已读取行数自增统计
 		readCnt++
 		select {
+		// 读取到的日志将会推送到stream中,供消费者组进行消费
 		case r.Stream <- line.Text:
 		default:
 			// 已过滤行数自增统计

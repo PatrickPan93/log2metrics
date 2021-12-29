@@ -1,5 +1,10 @@
 local_config:
   nginx_log_generating: true
+  rate_per_second: 100
+
+log_collecting:
+  enable: true
+
 
 log_strategies:
   # 指定暴露的metrics name
@@ -16,5 +21,6 @@ log_strategies:
     metric_help: nginx code avg
     file_path: access.log
     pattern:  '.*\[code=(.*?)\].*'
-    func: avg
-
+    func: cnt
+    tags:
+      level: '.*\[code=(.*?)\].*'

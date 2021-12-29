@@ -14,10 +14,16 @@ type Config struct {
 	LogStrategies []*LogStrategy ` yaml:"log_strategies"`
 	HttpAddr      string         `yaml:"http_addr"`
 	LocalConfig   *Local         `yaml:"local_config"`
+	LogCollecting *LogCollecting `yaml:"log_collecting"`
+}
+
+type LogCollecting struct {
+	Enable bool `yaml:"enable"`
 }
 
 type Local struct {
 	NginxLogGenerating bool `yaml:"nginx_log_generating"`
+	RatePerSecond      int  `yaml:"rate_per_second"`
 }
 
 // LogStrategy 定义log配置结构体

@@ -1,14 +1,16 @@
-package metric
+package metrics
 
 import (
 	"log2metrics/src/modules/agent/config"
+	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// CreateMetrics 根据配置生成prometheus metrics
 func CreateMetrics(ss []*config.LogStrategy) map[string]*prometheus.GaugeVec {
-	pgvMap := make(map[string]*prometheus.GaugeVec, 0)
+	mmap := map[string]*prometheus.GaugeVec{}
 	for _, s := range ss {
 		var labels []string
 		for k := range s.Tags {
@@ -18,7 +20,12 @@ func CreateMetrics(ss []*config.LogStrategy) map[string]*prometheus.GaugeVec {
 			Name: s.MetricName,
 			Help: s.MetricHelp,
 		}, labels)
-		pgvMap[s.MetricName] = m
+		mmap[s.MetricName] = m
 	}
-	return pgvMap
+	return mmap
+}
+func StartMetricWeb(addr string) error {
+	http.Handle("/metrics", promhttp.Handler())
+	srv := http.Server{Addr: addr}
+	return srv.ListenAndServe()
 }
